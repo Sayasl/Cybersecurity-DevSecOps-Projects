@@ -1,0 +1,125 @@
+name: Secure CI/CD for OWASP Juice Shop
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build & Test Juice Shop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+
+  sast:
+    name: Static Analysis (Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit Scan
+        run: bandit -r . -f html -o bandit_report.html || true
+
+      - name: Upload Bandit Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-report
+          path: bandit_report.html
+
+  sca:
+    name: Software Composition Analysis (Snyk)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Snyk
+        run: npm install -g snyk
+
+      - name: Run Snyk Scan
+        run: snyk test --json > snyk_report.json || true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Snyk Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: snyk-report
+          path: snyk_report.json
+
+  dast:
+    name: Dynamic Analysis (OWASP ZAP)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Start Juice Shop
+        run: |
+          docker run -d -p 3000:3000 bkimminich/juice-shop
+          sleep 30  # Wait for Juice Shop to start
+
+      - name: Run OWASP ZAP Scan
+        run: |
+          docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000 -r zap_report.html
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: zap_report.html
+
+  container_scan:
+    name: Container Image Security (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Trivy
+        run: sudo apt-get install -y trivy
+
+      - name: Scan OWASP Juice Shop Image
+        run: trivy image bkimminich/juice-shop --format txt --output trivy_report.txt || true
+
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-report
+          path: trivy_report.txt
+
+  secrets_scan:
+    name: Secret Scanning (TruffleHog)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install TruffleHog
+        run: pip install trufflehog
+
+      - name: Run TruffleHog
+        run: trufflehog --regex --entropy=True . > trufflehog_report.txt || true
+
+      - name: Upload TruffleHog Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: trufflehog-report
+          path: trufflehog_report.txt
