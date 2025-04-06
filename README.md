@@ -78,51 +78,49 @@ This project focuses on securing the OWASP Juice Shop, a deliberately insecure w
 
 ---
 
-## **Installation & Usage**
+## Tools Used
 
-### **1. Clone the Repository**
-```bash
-git clone https://github.com/juice-shop/juice-shop
-cd juice-shop
-```
+### Cybersecurity & Penetration Testing
+<img src="https://img.shields.io/badge/-OWASP%20ZAP-000000?style=for-the-badge&logo=OWASP&logoColor=white" />
+<img src="https://img.shields.io/badge/-Burp%20Suite-FF5722?style=for-the-badge&logo=PortSwigger&logoColor=white" />
 
-### **2. Set Up & Run the Application**
-```bash
-docker-compose up -d
-```
-
-### **3. Perform Security Scanning**
-```bash
-# Run OWASP ZAP Scan
-docker run -v $(pwd):/zap/wrk -t owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000
-```
-
-### **4. Deploy Secure Infrastructure with Terraform**
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-
-### **5. Run Security Tests in CI/CD Pipeline**
-```yaml
-jobs:
-  security_scan:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-      - name: Run Bandit (SAST)
-        run: bandit -r .
-      - name: Run Trivy (Container Scanning)
-        run: trivy image myapp:latest
-```
+- **OWASP ZAP** – Dynamic analysis for detecting runtime vulnerabilities (DAST)
+- **Burp Suite** – Web application penetration testing and exploitation
+- **STRIDE** – Threat modeling framework to identify application risks
 
 ---
 
-## **Contributors**
-- **Sayed Aslam** - Researcher
+### DevSecOps & Secure CI/CD
+<img src="https://img.shields.io/badge/-Bandit-000000?style=for-the-badge&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/-Snyk-4C4A73?style=for-the-badge&logo=Snyk&logoColor=white" />
+<img src="https://img.shields.io/badge/-Trivy-0F92A2?style=for-the-badge&logo=aqua&logoColor=white" />
+<img src="https://img.shields.io/badge/-TruffleHog-FF4088?style=for-the-badge&logoColor=white" />
+<img src="https://img.shields.io/badge/-Dependabot-025E8C?style=for-the-badge&logo=Dependabot&logoColor=white" />
+<img src="https://img.shields.io/badge/-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
 
+- **Bandit** – Static code analyzer for Python (SAST)
+- **Snyk** – Open-source dependency scanning (SCA)
+- **Trivy** – Container image and IaC vulnerability scanner
+- **TruffleHog** – Detect secrets in code repositories
+- **Dependabot** – Automated security patching for dependencies
+- **Docker** – Containerization for secure app deployment
+
+---
+
+### Infrastructure as Code (IaC)
+<img src="https://img.shields.io/badge/-Terraform-623CE4?style=for-the-badge&logo=terraform&logoColor=white" />
+
+- **Terraform** – Infrastructure provisioning with security-first configurations
+- **AWS GuardDuty / GCP Security Command Center** – Cloud-native threat detection
+
+---
+
+### Monitoring & Logging
+<img src="https://img.shields.io/badge/-Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white" />
+<img src="https://img.shields.io/badge/-Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white" />
+
+- **Prometheus** – Metrics collection for continuous monitoring
+- **Grafana** – Real-time dashboards and security alerting
 ---
 
 ## **License**
